@@ -7,7 +7,7 @@ import urllib
 from google.appengine.api import users
 from google.appengine.ext import ndb
 
-template_dir = os.path.join(os.path.dirname(__file__), 'templates')
+template_dir = os.path.join(os.path.dirname(__file__), )
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
 
 class Handler(webapp2.RequestHandler):
@@ -21,7 +21,7 @@ class Handler(webapp2.RequestHandler):
     def render(self, template, **kwargs):
         self.write(self.render_str(template, **kwargs))
 
-HtmlDoc = open('templates\wallcontent.html')
+HtmlDoc = open('wallcontent.html')
 HTML_TEMPLATE = HtmlDoc.read()
 
 DEFAULT_WALL = 'Public'
@@ -90,11 +90,12 @@ class Posts(webapp2.RequestHandler):
       post.author = Author(
             name='anonymous@anonymous.com',
             email='anonymous@anonymous.com')
-    if post.content is None:
+    post.content = self.request.get('content')
+    if post.content == '':
         post.content = "Please enter a comment"
+        post.put()
     else:
-        post.content = self.request.get('content')
-    post.put()
+        post.put()
     self.redirect('/wall')
 
 class MainHandler(Handler):
