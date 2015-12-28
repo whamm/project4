@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+	<head>
+
+	    <meta charset="UTF-8">
+
+	    <link rel="stylesheet" type="text/css" href="projectpage.css">
+
+	    <title>Udacity Project Page</title>
+
+	</head>
+
+	<body>
+
+		<h1 class ="comments"><a href="/"> Return to content</a></h1>
+
+		    <form action="/sign?{0}" method="post">
+      <div><textarea name="content" rows="3" cols="60"></textarea></div>
+
+      <div><input type="submit" value="Post Comment"></div>
+    </form>
+    <hr>
+    <form>Wall:
+      <input value="{1}" name="wall_name">
+      <input type="submit" value="Switch">
+    </form>
+    <br>
+    Logged in as: <strong>{2}</strong><br>
+    <a href="{3}">{4}</a>
+
+    {5}
+
+	</body>
+</html>
