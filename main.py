@@ -40,9 +40,11 @@ class Post(ndb.Model):
   author = ndb.StructuredProperty(Author)
   content = ndb.StringProperty(indexed=False)
   date = ndb.DateTimeProperty(auto_now_add=True)
+  error= ''
 
 
 class Wall(webapp2.RequestHandler):
+
   def get(self):
     wall_name = self.request.get('wall_name',DEFAULT_WALL)
     if wall_name == DEFAULT_WALL.lower(): wall_name = DEFAULT_WALL
@@ -59,7 +61,7 @@ class Wall(webapp2.RequestHandler):
         url = users.create_login_url(self.request.uri)
         url_linktext = 'Login'
         user_name = 'Anonymous Poster'
-
+    error = Post.error
     posts_html = ''
     for post in posts:
       if user and user.user_id() == post.author.identity:
@@ -73,7 +75,7 @@ class Wall(webapp2.RequestHandler):
     sign_query_params = urllib.urlencode({'wall_name': wall_name})
 
     rendered_HTML = (HTML_TEMPLATE) .format(sign_query_params, cgi.escape(wall_name), user_name,
-                                    url, url_linktext, posts_html)
+                                    url, url_linktext, posts_html, error)
 
     self.response.out.write(rendered_HTML)
 
@@ -92,9 +94,9 @@ class Posts(webapp2.RequestHandler):
             email='anonymous@anonymous.com')
     post.content = self.request.get('content')
     if post.content == '':
-        post.content = "Please enter a comment"
-        post.put()
+        Post.error = "Please Enter A Comment"
     else:
+        Post.error = ''
         post.put()
     self.redirect('/wall')
 
