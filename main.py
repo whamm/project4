@@ -1,4 +1,3 @@
-
 import os
 import webapp2
 import jinja2
@@ -6,6 +5,7 @@ import cgi
 import urllib
 from google.appengine.api import users
 from google.appengine.ext import ndb
+
 
 template_dir = os.path.join(os.path.dirname(__file__), )
 jinja_env = jinja2.Environment(loader = jinja2.FileSystemLoader(template_dir), autoescape = True)
@@ -40,7 +40,6 @@ class Post(ndb.Model):
   author = ndb.StructuredProperty(Author)
   content = ndb.StringProperty(indexed=False)
   date = ndb.DateTimeProperty(auto_now_add=True)
-  error= ''
 
 
 class Wall(webapp2.RequestHandler):
@@ -61,7 +60,6 @@ class Wall(webapp2.RequestHandler):
         url = users.create_login_url(self.request.uri)
         url_linktext = 'Login'
         user_name = 'Anonymous Poster'
-    error = Post.error
     posts_html = ''
     for post in posts:
       if user and user.user_id() == post.author.identity:
@@ -73,6 +71,10 @@ class Wall(webapp2.RequestHandler):
       posts_html += '</div>\n'
 
     sign_query_params = urllib.urlencode({'wall_name': wall_name})
+    error = ''
+    if self.request.get('error') == 'True':
+        error = "Please enter a comment"
+
 
     rendered_HTML = (HTML_TEMPLATE) .format(sign_query_params, cgi.escape(wall_name), user_name,
                                     url, url_linktext, posts_html, error)
@@ -94,11 +96,11 @@ class Posts(webapp2.RequestHandler):
             email='anonymous@anonymous.com')
     post.content = self.request.get('content')
     if post.content == '':
-        Post.error = "Please Enter A Comment"
+        self.redirect("wall?error=True", True)
     else:
-        Post.error = ''
         post.put()
-    self.redirect('/wall')
+        self.redirect('/wall')
+
 
 class MainHandler(Handler):
     def get(self):
